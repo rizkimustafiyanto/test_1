@@ -1,0 +1,21 @@
+{
+  "name": "flowforge",
+  "private": true,
+  "packageManager": "npm@10.8.2",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint --filter=!@flowforge/ui --filter=!@flowforge/frontend",
+    "type-check": "turbo run type-check --filter=!@flowforge/ui",
+    "check": "npm run lint && npm run type-check"
+  },
+  "devDependencies": {
+    "execa": "^9.6.0",
+    "inquirer": "^13.2.2",
+    "turbo": "^2.9.6"
+  }
+}

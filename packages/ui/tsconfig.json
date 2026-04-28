@@ -1,0 +1,29 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "preserve",
+    "useDefineForClassFields": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "types": ["vue"],
+    "paths": {
+      "@flowforge/types": ["packages/types/dist/index.d.ts"],
+      "vee-validate": ["packages/ui/shims/vee-validate.ts"],
+      "apexcharts": ["packages/ui/shims/apexcharts.ts"],
+      "vue3-apexcharts": ["packages/ui/shims/vue3-apexcharts.ts"]
+    }
+  },
+  "include": [
+    "./components/**/*.vue",
+    "./**/*.ts",
+    "./**/*.tsx",
+    "./**/*.js",
+    "./**/*.d.ts",
+    "./env.d.ts"
+  ],
+  "exclude": ["node_modules", "dist"]
+}
