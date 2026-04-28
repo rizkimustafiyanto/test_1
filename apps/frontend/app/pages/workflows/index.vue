@@ -5,7 +5,6 @@ import BaseLoadingSpinner from '../../../../../packages/ui/components/base/loadi
 import WorkflowPageShell from '../../components/WorkflowPageShell.vue'
 import WorkflowTokenPanel from '../../components/WorkflowTokenPanel.vue'
 import WorkflowTopPanel from '../../components/WorkflowTopPanel.vue'
-const router = useRouter()
 const {
   token,
   workflows,
@@ -28,11 +27,6 @@ const workflowSettingSnapshots = computed(() => {
     prettyDefinition: JSON.stringify(workflow.definition, null, 2),
   }))
 })
-
-async function openWorkflow(workflowId: string) {
-  selectWorkflow(workflowId)
-  await router.push(`/workflows/${workflowId}`)
-}
 
 async function handleLoadWorkflows() {
   console.log('[WorkflowListPage] load workflows requested', {
@@ -169,12 +163,12 @@ watch(token, async (value, previousValue) => {
       </div>
 
       <div v-else class="grid gap-4 xl:grid-cols-2">
-        <button
+        <NuxtLink
           v-for="workflow in workflowSettingSnapshots"
           :key="workflow.id"
-          type="button"
-          class="rounded-[28px] border border-slate-200 bg-white p-5 text-left shadow-[0_16px_40px_rgba(15,23,42,0.05)] transition hover:-translate-y-0.5 hover:border-slate-300"
-          @click="openWorkflow(workflow.id)"
+          :to="`/workflows/${workflow.id}`"
+          class="block rounded-[28px] border border-slate-200 bg-white p-5 text-left shadow-[0_16px_40px_rgba(15,23,42,0.05)] transition hover:-translate-y-0.5 hover:border-slate-300"
+          @click="selectWorkflow(workflow.id)"
         >
           <div class="flex items-start justify-between gap-3">
             <div>
@@ -213,7 +207,7 @@ watch(token, async (value, previousValue) => {
             <span>Card ini juga tetap bisa dibuka ke detail workflow.</span>
             <span class="font-semibold text-slate-900">Open detail</span>
           </div>
-        </button>
+        </NuxtLink>
       </div>
     </BaseCard>
   </WorkflowPageShell>

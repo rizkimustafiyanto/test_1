@@ -24,6 +24,7 @@ const {
   workflowSummaryStats,
   recentRunTimeline,
   dashboardStore,
+  createSeedJwt,
   loadWorkflows,
   loadWorkflowDetail,
   loadWorkflowRuns,
@@ -59,16 +60,30 @@ async function runAndOpenMonitor() {
   }
 }
 
-onMounted(async () => {
-  if (token.value.trim()) {
+function ensureSeedToken() {
+  if (!token.value.trim()) {
+    dashboardStore.setToken(createSeedJwt())
+  }
+}
+
+async function ensureWorkflowDetailHydrated() {
+  ensureSeedToken()
+
+  if (token.value.trim() && !selectedWorkflow.value) {
     await loadWorkflows()
   }
 
   await hydrateWorkflowPage()
+}
+
+await ensureWorkflowDetailHydrated()
+
+onMounted(async () => {
+  await ensureWorkflowDetailHydrated()
 })
 
 watch(workflowId, async () => {
-  await hydrateWorkflowPage()
+  await ensureWorkflowDetailHydrated()
 })
 
 watch(token, async (value, previousValue) => {
@@ -76,7 +91,7 @@ watch(token, async (value, previousValue) => {
     return
   }
 
-  await hydrateWorkflowPage()
+  await ensureWorkflowDetailHydrated()
 })
 </script>
 
