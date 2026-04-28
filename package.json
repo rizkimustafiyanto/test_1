@@ -8,10 +8,14 @@
   ],
   "scripts": {
     "dev": "turbo run dev",
+    "dev:frontend": "turbo run dev --filter=@flowforge/frontend",
+    "dev:backend": "turbo run dev --filter=@flowforge/backend",
+    "dev:demo": "turbo run dev --filter=@flowforge/backend --filter=@flowforge/frontend",
     "build": "turbo run build",
     "lint": "turbo run lint --filter=!@flowforge/ui --filter=!@flowforge/frontend",
     "type-check": "turbo run type-check --filter=!@flowforge/ui",
-    "check": "npm run lint && npm run type-check"
+    "check": "npm run lint && npm run type-check",
+    "seed:backend": "npm run prisma:seed --workspace @flowforge/backend"
   },
   "devDependencies": {
     "execa": "^9.6.0",

@@ -18,9 +18,11 @@ export type WorkflowRecord = {
   tenantId: string
   key?: string
   workflowVersionId?: string
+  latestVersionId?: string
   name: string
   description?: string
   definition: WorkflowDefinition
+  createdByUserId?: string
   createdAt: string
   updatedAt: string
 }

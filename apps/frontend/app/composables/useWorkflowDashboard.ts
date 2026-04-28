@@ -1,6 +1,12 @@
 import { storeToRefs } from 'pinia'
 import { FetchError } from 'ofetch'
 import type { WorkflowRecord, WorkflowRunRecord } from '../types/workflow'
+import {
+  cloneDemoWorkflowRuns,
+  cloneDemoWorkflows,
+  findDemoRun,
+  findDemoWorkflow,
+} from '../mocks/workflow-demo'
 import { useWorkflowDashboardStore } from '../stores/workflow-dashboard'
 
 const WORKFLOW_DASHBOARD_TOKEN_STORAGE_KEY = 'workflow-dashboard-token'
@@ -212,6 +218,52 @@ export function useWorkflowDashboard() {
     return error instanceof Error ? error.message : fallback
   }
 
+  function applyDemoWorkflowFallback(reason: string) {
+    const fallbackWorkflows = cloneDemoWorkflows()
+    dashboardStore.setWorkflows(fallbackWorkflows)
+
+    if (selectedWorkflowId.value) {
+      dashboardStore.setSelectedWorkflow(
+        fallbackWorkflows.find(workflow => workflow.id === selectedWorkflowId.value) ?? null,
+      )
+    }
+
+    dashboardStore.setDebugMessage(
+      `Backend tidak tersedia. Frontend memakai data demo lokal. Detail: ${reason}`,
+    )
+  }
+
+  function applyDemoWorkflowDetailFallback(workflowId: string, reason: string) {
+    const workflow = findDemoWorkflow(workflowId)
+
+    if (workflow) {
+      dashboardStore.setSelectedWorkflow(workflow)
+      dashboardStore.setDebugMessage(
+        `Detail workflow diambil dari data demo lokal karena backend tidak tersedia. Detail: ${reason}`,
+      )
+    }
+
+    return workflow
+  }
+
+  function applyDemoWorkflowRunsFallback(workflowId: string, reason: string) {
+    const runs = cloneDemoWorkflowRuns(workflowId)
+    dashboardStore.setWorkflowRuns(runs)
+
+    if (runs.length > 0) {
+      const preferredRun = runs.find(run => run.id === selectedRunId.value) ?? runs[0]
+      dashboardStore.setSelectedRun(preferredRun)
+    } else {
+      dashboardStore.setSelectedRun(null)
+    }
+
+    dashboardStore.setDebugMessage(
+      `Riwayat run diambil dari data demo lokal karena backend tidak tersedia. Detail: ${reason}`,
+    )
+
+    return runs
+  }
+
   function decodeJwtPayload(rawToken: string) {
     const normalizedToken = normalizeTokenValue(rawToken)
 
@@ -292,10 +344,10 @@ export function useWorkflowDashboard() {
       return response
     } catch (error) {
       console.error('[useWorkflowDashboard] loadWorkflows failed', error)
-      resetDashboardState()
-      dashboardStore.setDebugMessage(`Load workflows gagal: ${getApiErrorMessage(error, 'Gagal memuat workflows.')}`)
-      dashboardStore.setApiError(getApiErrorMessage(error, 'Gagal memuat workflows.'))
-      return []
+      const message = getApiErrorMessage(error, 'Gagal memuat workflows.')
+      dashboardStore.setApiError(message)
+      applyDemoWorkflowFallback(message)
+      return cloneDemoWorkflows()
     } finally {
       dashboardStore.setLoading('workflows', false)
     }
@@ -314,8 +366,9 @@ export function useWorkflowDashboard() {
       dashboardStore.setSelectedWorkflow(workflow)
       return workflow
     } catch (error) {
-      dashboardStore.setApiError(getApiErrorMessage(error, 'Gagal memuat detail workflow.'))
-      return null
+      const message = getApiErrorMessage(error, 'Gagal memuat detail workflow.')
+      dashboardStore.setApiError(message)
+      return applyDemoWorkflowDetailFallback(workflowId, message)
     } finally {
       dashboardStore.setLoading('workflowDetail', false)
     }
@@ -341,8 +394,9 @@ export function useWorkflowDashboard() {
 
       return runs
     } catch (error) {
-      dashboardStore.setApiError(getApiErrorMessage(error, 'Gagal memuat run history.'))
-      return []
+      const message = getApiErrorMessage(error, 'Gagal memuat run history.')
+      dashboardStore.setApiError(message)
+      return applyDemoWorkflowRunsFallback(workflowId, message)
     } finally {
       dashboardStore.setLoading('runs', false)
     }
@@ -359,8 +413,19 @@ export function useWorkflowDashboard() {
       dashboardStore.setSelectedRun(run)
       return run
     } catch (error) {
-      dashboardStore.setApiError(getApiErrorMessage(error, 'Gagal memuat run detail.'))
-      return null
+      const message = getApiErrorMessage(error, 'Gagal memuat run detail.')
+      const run = findDemoRun(runId)
+      dashboardStore.setApiError(message)
+
+      if (run) {
+        dashboardStore.patchRun(run)
+        dashboardStore.setSelectedRun(run)
+        dashboardStore.setDebugMessage(
+          `Detail run diambil dari data demo lokal karena backend tidak tersedia. Detail: ${message}`,
+        )
+      }
+
+      return run
     }
   }
 
