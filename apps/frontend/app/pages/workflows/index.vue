@@ -44,6 +44,16 @@ function useSeedJwt() {
   console.log('[WorkflowListPage] seed jwt inserted')
 }
 
+function handleUseSeedJwtClick() {
+  console.log('[WorkflowListPage] Use Seed JWT button clicked')
+  useSeedJwt()
+}
+
+async function handleLoadWorkflowsClick() {
+  console.log('[WorkflowListPage] Load Workflows button clicked')
+  await handleLoadWorkflows()
+}
+
 onMounted(async () => {
   if (token.value.trim() && !workflows.value.length) {
     await handleLoadWorkflows()
@@ -82,41 +92,42 @@ watch(token, async (value, previousValue) => {
         @update-token="dashboardStore.setToken"
       />
 
-      <div class="grid gap-4 rounded-3xl border border-slate-200 bg-slate-50 p-5 lg:grid-cols-[1.3fr_0.7fr]">
-        <div class="space-y-3">
-          <h2 class="text-lg font-semibold text-slate-900">Cara Tes Frontend Ini</h2>
-          <ol class="space-y-2 text-sm text-slate-600">
-            <li>1. Klik <span class="font-semibold text-slate-900">Use Seed JWT</span> untuk mengisi token demo lokal.</li>
-            <li>2. Klik <span class="font-semibold text-slate-900">Load Workflows</span> untuk mengambil data workflow dari backend.</li>
-            <li>3. Klik salah satu card workflow untuk masuk ke halaman detail dan trigger run.</li>
-          </ol>
-          <p class="text-xs text-slate-500">
-            Tenant seed lokal: <code>00000000-0000-0000-0000-000000000001</code>
-          </p>
-          <p v-if="decodedToken?.tenantId" class="text-xs text-slate-500">
-            Tenant token aktif: <code>{{ decodedToken.tenantId }}</code>
-          </p>
-        </div>
-
-        <div class="flex flex-col gap-3">
-          <button
-            type="button"
-            class="inline-flex min-h-12 items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
-            @click="console.log('[WorkflowListPage] Use Seed JWT button clicked'); useSeedJwt()"
-          >
-            Use Seed JWT
-          </button>
-          <button
-            type="button"
-            class="inline-flex min-h-12 items-center justify-center rounded-2xl border border-slate-900 bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
-            :disabled="loading.workflows"
-            @click="console.log('[WorkflowListPage] Load Workflows button clicked'); handleLoadWorkflows()"
-          >
-            {{ loading.workflows ? 'Loading...' : 'Load Workflows' }}
-          </button>
-        </div>
-      </div>
     </WorkflowTopPanel>
+
+    <section class="relative z-20 space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_10px_24px_rgba(15,23,42,0.12)] ring-1 ring-slate-200">
+      <div class="space-y-3">
+        <h2 class="text-lg font-semibold text-slate-900">Cara Tes Frontend Ini</h2>
+        <ol class="space-y-2 text-sm text-slate-600">
+          <li>1. Klik <span class="font-semibold text-slate-900">Use Seed JWT</span> untuk mengisi token demo lokal.</li>
+          <li>2. Klik <span class="font-semibold text-slate-900">Load Workflows</span> untuk mengambil data workflow dari backend.</li>
+          <li>3. Klik salah satu card workflow untuk masuk ke halaman detail dan trigger run.</li>
+        </ol>
+        <p class="text-xs text-slate-500">
+          Tenant seed lokal: <code>00000000-0000-0000-0000-000000000001</code>
+        </p>
+        <p v-if="decodedToken?.tenantId" class="text-xs text-slate-500">
+          Tenant token aktif: <code>{{ decodedToken.tenantId }}</code>
+        </p>
+      </div>
+
+      <div class="grid gap-3 sm:grid-cols-2">
+        <button
+          type="button"
+          class="relative z-30 inline-flex min-h-12 cursor-pointer items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
+          @click="handleUseSeedJwtClick"
+        >
+          Use Seed JWT
+        </button>
+        <button
+          type="button"
+          class="relative z-30 inline-flex min-h-12 cursor-pointer items-center justify-center rounded-2xl border border-slate-900 bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+          :disabled="loading.workflows"
+          @click="handleLoadWorkflowsClick"
+        >
+          {{ loading.workflows ? 'Loading...' : 'Load Workflows' }}
+        </button>
+      </div>
+    </section>
 
     <BaseCard size="lg" variant="secondary" class-override="space-y-4">
       <div class="flex items-center justify-between gap-3">

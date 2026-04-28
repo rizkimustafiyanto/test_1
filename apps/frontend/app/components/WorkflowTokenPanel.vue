@@ -20,7 +20,7 @@ const emit = defineEmits<{
 <template>
   <div class="space-y-4">
     <div class="grid gap-4 lg:grid-cols-[1.4fr_auto]">
-      <label class="space-y-2">
+      <label class="block space-y-2">
         <span class="text-sm font-medium text-slate-700">JWT Token</span>
         <textarea
           :value="token"

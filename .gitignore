@@ -45,7 +45,7 @@ Thumbs.db
 # ----------------------
 .vscode/
 .idea/
-.codex/
+.codex
 
 # ----------------------
 # Prisma
